@@ -12,7 +12,6 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="client.js"></script>
 
 </head>
 
@@ -50,6 +49,15 @@
                                 </div>
                             </form>
                             <div id="status"></div>
+                            <div id="congrats"></div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-2 col-sm-10">
+                            <h1>High Score: <span id="highscore"></span></h1>
                         </div>
                     </div>
                 </div>
@@ -64,35 +72,45 @@
     $(document).ready(function() {
         window.answer = "";
         var miscount = 0;
+        var score = 0;
+        //get high score
+        gethighscore();
+
         //Get Answer
         $("#submitResponse").click(function() {
             var userResponse = $("#userResponse").val(); //.toLowerCase();
             userResponse = userResponse.toLowerCase();
             console.log('answer: ' + window.answer + " and response: " + userResponse);
             clearInput();
-
-            $.post("/getanswer", userResponse, function(data, status) {
-                if (window.answer.includes(userResponse)) {
-                    $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong> You answered correctly.</div>');
+            if (window.answer.includes(userResponse) && (userResponse.length > 2)) {
+                $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success +100 Points!</strong> You answered correctly.</div>');
+                score = score + 100;
+            } else {
+                if (miscount >= 3) {
+                    $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try typing window.answer in the console</em>' + '.</div>')
+                } else if (miscount == 2) {
+                    $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try typing window.(then a variable name) in the console</em>' + '.</div>')
+                } else if (miscount == 1) {
+                    $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try using your console log</em>' + '.</div>')
                 } else {
-                    if (miscount >= 3) {
-                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try typing window.answer in the console</em>' + '.</div>')
-                    } else if (miscount == 2) {
-                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try typing window.(then a variable name) in the console</em>' + '.</div>')
-                    } else if (miscount == 1) {
-                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try using your console log</em>' + '.</div>')
-                    } else {
-                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>')
-                    }
-                    miscount = miscount + 1;
-
+                    $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>')
                 }
+                miscount = miscount + 1;
+            }
 
-                //alert user fadeout
-                window.setTimeout(function() {
-                    $(".alert-success").alert('close');
-                }, 3000);
+            //alert user fadeout
+            window.setTimeout(function() {
+                $(".alert-success").alert('close');
+            }, 3000);
+
+            $.post("/getanswer?s=" + score, score, function(data, status) {
+                if (data.includes('high')) {
+                    //alert("Congrats! You have the high score!!!");
+                    $("#congrats").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Congrats!</strong> You have the high score! <strong>')
+                }
             });
+            gethighscore();
+
         });
 
     });
@@ -101,6 +119,13 @@
     function clearInput() {
         $('#userResponse').val('');
         $('#userResponse').focus().select();
+    }
+
+    //high score
+    function gethighscore() {
+        $.get('/highscore', function(data) {
+            $("#highscore").html(data);
+        });
     }
 
     //get new question
@@ -157,12 +182,12 @@
         height: 100%;
         width: 100%;
     }
-    
+
     .middle {
         display: table-cell;
         vertical-align: middle;
     }
-    
+
     .inner {
         margin-left: auto;
         margin-right: auto;
