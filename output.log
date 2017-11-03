@@ -1,0 +1,26 @@
+nohup: ignoring input
+[0mGET / [32m200 [0m8.808 ms - 4917[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m154.853 ms - 456[0m
+[0mGET / [36m304 [0m1.373 ms - -[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m112.308 ms - 425[0m
+[0mPOST /getanswer [32m200 [0m20.631 ms - -[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m77.860 ms - 490[0m
+[0mGET / [32m200 [0m1.686 ms - 4917[0m
+In getquestion
+[0mGET /favicon.ico [33m404 [0m9.677 ms - 1126[0m
+[0mGET /getquestion [32m200 [0m122.455 ms - 461[0m
+[0mPOST /getanswer [32m200 [0m1.068 ms - -[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m98.424 ms - 491[0m
+[0mPOST /getanswer [32m200 [0m0.579 ms - -[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m63.540 ms - 468[0m
+[0mPOST /getanswer [32m200 [0m0.368 ms - -[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m69.273 ms - 486[0m
+[0mPOST /getanswer [32m200 [0m0.988 ms - -[0m
+In getquestion
+[0mGET /getquestion [32m200 [0m77.405 ms - 431[0m

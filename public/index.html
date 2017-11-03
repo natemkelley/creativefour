@@ -12,124 +12,164 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-
-    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
-        <!-- Latest compiled and minified CSS -->
-        <
-        link rel = "stylesheet"
-        href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
-
-            <!-- jQuery library -->
-            <
-            script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" >
-
-    </script>
-
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="client.js"></script>
 
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <div class="form-group">
-                    <h3>Let's play trivia</h3>
-                </div>
-
-                <div class="form-group">
-                    <h5><strong>Current Question: </strong><span id="displayQuestion">...</span></h5>
-                </div>
-                <form class="form-horizontal">
-                    <div class="row">
-                        <div class="col-md-10 col-md-offset-0 col-sm-10">
-                            <input placeholder="Enter your answer" type="text" id="userResponse" value="" class="form-control">
-                        </div>
-                        <div class="col-md-2 col-sm-2">
-                            <button type='button' class="btn-danger btn-md" id="submitResponse">Submit</button>
+    <div class="outer">
+        <div class="middle">
+            <div class="inner">
+                <div class="container" style="margin-top: -12%;">
+                    <div class="row text-center">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div class="form-group">
+                                <h1>Test your Google <em>(or hacking)</em> skills!</h1>
+                                <h3>A Jeopardy Style Trivia Game</h3>
+                            </div>
                         </div>
                     </div>
-                </form>
-                <div id="status"></div>
+                </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2" style="border-style: dashed;border-color: #e3e3e3; padding: 30px;margin-top: 20px;">
+                            <div>
+                                <h4><strong>Category: </strong><span id="displayCategory" style="text-transform: uppercase">...</span></h4>
+                                <h4 style="line-height: 25px;"><strong>Current Question: </strong><span id="displayQuestion">...</span></h4>
+                            </div>
+
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-md-10 col-md-offset-0 col-sm-10">
+                                        <input placeholder="Enter your answer" type="text" id="userResponse" value="" class="form-control">
+                                    </div>
+                                    <div class="col-md-2 col-sm-2">
+                                        <button type='button' class="btn btn-danger btn-md" id="submitResponse">Submit</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div id="status"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
-
     </div>
+
 </body>
-
-
 
 
 <script>
     $(document).ready(function() {
-
+        window.answer = "";
+        var miscount = 0;
         //Get Answer
         $("#submitResponse").click(function() {
-            console.log('getting answer');
-            $.post("/getanswer", $("#userResponse").val(),
-                function(data, status) {
-                    //alert("Data: " + data + "\nStatus: " + status);
+            var userResponse = $("#userResponse").val(); //.toLowerCase();
+            userResponse = userResponse.toLowerCase();
+            console.log('answer: ' + window.answer + " and response: " + userResponse);
+            clearInput();
 
-                    if (data == "correct") {
-                        $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong> This alert box could indicates you answered correctly.</div>');
-                    } else if (data == "incorrect") {
-                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> This alert box could indicates you answered poorly.</div>');
+            $.post("/getanswer", userResponse, function(data, status) {
+                if (window.answer.includes(userResponse)) {
+                    $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong> You answered correctly.</div>');
+                } else {
+                    if (miscount >= 3) {
+                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try typing window.answer in the console</em>' + '.</div>')
+                    } else if (miscount == 2) {
+                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try typing window.(then a variable name) in the console</em>' + '.</div>')
+                    } else if (miscount == 1) {
+                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>. <br><em>Hint: try using your console log</em>' + '.</div>')
+                    } else {
+                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> The correct answer was <strong>' + window.answer + '</strong>')
                     }
+                    miscount = miscount + 1;
 
-                    //REMOVE THIS WHEN IT IS WORKING
-                    $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong> This alert box could indicates you answered correctly.</div>');
+                }
 
-                });
-            $(".alert-success").alert();
-            window.setTimeout(function() {
-                $(".alert-success").alert('close');
-            }, 2000);
-
-        });
-
-        //get new question
-        $("#submitResponse").click(function() {
-            console.log('getting new question');
-            var url = "/getquestion";
-            $.getJSON(url, function(data) {
-                var everything = "nothing...";
-                $.each(data, function(i, item) {
-                    everything += data[i].question;
-                });
-                $("#displayQuestion").html(everything);
+                //alert user fadeout
+                window.setTimeout(function() {
+                    $(".alert-success").alert('close');
+                }, 3000);
             });
-
         });
 
+    });
 
-        /*Get the question on load */
+    //clear input
+    function clearInput() {
+        $('#userResponse').val('');
+        $('#userResponse').focus().select();
+    }
+
+    //get new question
+    $("#submitResponse").click(function() {
         var url = "/getquestion";
         $.getJSON(url, function(data) {
-            var everything;
-            everything = " ";
+            var everything = "";
+            var all = "";
             $.each(data, function(i, item) {
                 everything += data[i].question;
+                all += data[i].category.title;
+                window.answer = data[i].answer;
             });
+            window.answer = window.answer.toLowerCase();
             everything += "";
             $("#displayQuestion").html(everything);
+            $("#displayCategory").html(all);
         });
+    });
 
-        /*User enters do run click function instead of submitting!*/
-        $('#userResponse').keypress(function(e) {
-            if (e.keyCode == 13) {
-                $('#submitResponse').click();
-                $("form").submit(function() {
-                    return false;
-                });
-            }
+    /*Get the question on load */
+    var url = "/getquestion";
+    $.getJSON(url, function(data) {
+        var everything;
+        everything = " ";
+        var all = " ";
+        $.each(data, function(i, item) {
+            everything += data[i].question;
+            all += data[i].category.title;
+            window.answer = data[i].answer;
         });
+        window.answer = window.answer.toLowerCase();
+        everything += "";
+        $("#displayQuestion").html(everything);
+        $("#displayCategory").html(all);
+    });
+
+    /*User enters do run click function instead of submitting!*/
+    $('#userResponse').keypress(function(e) {
+        if (e.keyCode == 13) {
+            $('#submitResponse').click();
+            $("form").submit(function() {
+                return false;
+            });
+        }
     });
 
 </script>
 
+<style>
+    .outer {
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+    
+    .middle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+    
+    .inner {
+        margin-left: auto;
+        margin-right: auto;
+        width: /*whatever width you want*/
+        ;
+    }
 
+</style>
 
 </html>
