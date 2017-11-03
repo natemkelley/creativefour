@@ -1,0 +1,135 @@
+<html>
+
+<head>
+    <title>Node.Js APIs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
+        <!-- Latest compiled and minified CSS -->
+        <
+        link rel = "stylesheet"
+        href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" >
+
+            <!-- jQuery library -->
+            <
+            script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" >
+
+    </script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="form-group">
+                    <h3>Let's play trivia</h3>
+                </div>
+
+                <div class="form-group">
+                    <h5><strong>Current Question: </strong><span id="displayQuestion">...</span></h5>
+                </div>
+                <form class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-0 col-sm-10">
+                            <input placeholder="Enter your answer" type="text" id="userResponse" value="" class="form-control">
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <button type='button' class="btn-danger btn-md" id="submitResponse">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="status"></div>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+
+
+
+<script>
+    $(document).ready(function() {
+
+        //Get Answer
+        $("#submitResponse").click(function() {
+            console.log('getting answer');
+            $.post("/getanswer", $("#userResponse").val(),
+                function(data, status) {
+                    //alert("Data: " + data + "\nStatus: " + status);
+
+                    if (data == "correct") {
+                        $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong> This alert box could indicates you answered correctly.</div>');
+                    } else if (data == "incorrect") {
+                        $("#status").html('<div class="alert alert-danger alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Darn it!</strong> This alert box could indicates you answered poorly.</div>');
+                    }
+
+                    //REMOVE THIS WHEN IT IS WORKING
+                    $("#status").html('<div class="alert alert-success alert-dismissable fade in"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong> This alert box could indicates you answered correctly.</div>');
+
+                });
+            $(".alert-success").alert();
+            window.setTimeout(function() {
+                $(".alert-success").alert('close');
+            }, 2000);
+
+        });
+
+        //get new question
+        $("#submitResponse").click(function() {
+            console.log('getting new question');
+            var url = "/getquestion";
+            $.getJSON(url, function(data) {
+                var everything = "nothing...";
+                $.each(data, function(i, item) {
+                    everything += data[i].question;
+                });
+                $("#displayQuestion").html(everything);
+            });
+
+        });
+
+
+        /*Get the question on load */
+        var url = "/getquestion";
+        $.getJSON(url, function(data) {
+            var everything;
+            everything = " ";
+            $.each(data, function(i, item) {
+                everything += data[i].question;
+            });
+            everything += "";
+            $("#displayQuestion").html(everything);
+        });
+
+        /*User enters do run click function instead of submitting!*/
+        $('#userResponse').keypress(function(e) {
+            if (e.keyCode == 13) {
+                $('#submitResponse').click();
+                $("form").submit(function() {
+                    return false;
+                });
+            }
+        });
+    });
+
+</script>
+
+
+
+</html>
